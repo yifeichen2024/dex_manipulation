@@ -28,7 +28,7 @@ pip install playground
 > [!IMPORTANT]
 > Requires Python 3.10 or later.
 
-1. `git clone git@github.com:google-deepmind/mujoco_playground.git && cd mujoco_playground`
+1. `git@github.com:yifeichen2024/dex_manipulation.git && cd mujoco_playground`
 2. [Install uv](https://docs.astral.sh/uv/getting-started/installation/), a faster alternative to `pip`
 3. Create a virtual environment: `uv venv --python 3.11`
 4. Activate it: `source .venv/bin/activate`

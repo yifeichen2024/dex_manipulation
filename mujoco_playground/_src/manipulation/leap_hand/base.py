@@ -95,6 +95,11 @@ class LeapHandEnv(mjx_env.MjxEnv):
         mjx_env.get_sensor_data(self.mj_model, data, f"{name}_position")
         for name in consts.FINGERTIP_NAMES
     ])
+  
+  def get_contact_information(self, data:mjx.Data) -> jax.Array:
+    """Get Contact information between cube and hand"""
+    object_name = 'cube'
+    pass
 
   # Accessors.
 

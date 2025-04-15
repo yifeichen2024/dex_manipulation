@@ -77,8 +77,10 @@ class CubeRotateZAxis(leap_hand_base.LeapHandEnv):
     self._cube_qids = mjx_env.get_qpos_ids(self.mj_model, ["cube_freejoint"])
     self._floor_geom_id = self._mj_model.geom("floor").id
     self._cube_geom_id = self._mj_model.geom("cube").id
-
-    home_key = self._mj_model.keyframe("home")
+    # initial plam up setting
+    # home_key = self._mj_model.keyframe("home")
+    # palm down pos
+    home_key = self._mj_model.keyframe("grasp")
     self._init_q = jp.array(home_key.qpos)
     self._default_pose = self._init_q[self._hand_qids]
     self._lowers, self._uppers = self.mj_model.actuator_ctrlrange.T
