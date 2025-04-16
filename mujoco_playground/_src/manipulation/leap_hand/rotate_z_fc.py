@@ -191,7 +191,9 @@ class CubeRotateZAxisFC(leap_hand_base.LeapHandEnv):
     cube_linvel = self.get_cube_linvel(data)
     fingertip_positions = self.get_fingertip_positions(data)
     joint_torques = data.actuator_force
-
+    # adding contact info
+    contact_positions, contact_frames, contact_forces, contact_torques = self.get_contact_information(data)
+    
     privileged_state = jp.concatenate([
         state,
         joint_angles,

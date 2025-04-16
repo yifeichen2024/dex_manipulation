@@ -13,6 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 """Train a PPO agent using JAX on the specified environment."""
+# Training commend
+# python learning/train_jax_ppo.py --env_name=LeapCubeRotateZAxis --use_tb=True
 
 from datetime import datetime
 import functools

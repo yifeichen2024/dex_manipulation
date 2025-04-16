@@ -31,6 +31,7 @@ def default_config() -> config_dict.ConfigDict:
   return config_dict.create(
       ctrl_dt=0.05,
       sim_dt=0.01,
+      gravity=[0.0, 0.0, -9.81], # gravity settings
       action_scale=0.6,
       action_repeat=1,
       episode_length=500,
@@ -80,7 +81,7 @@ class CubeRotateZAxis(leap_hand_base.LeapHandEnv):
     # initial plam up setting
     # home_key = self._mj_model.keyframe("home")
     # palm down pos
-    home_key = self._mj_model.keyframe("grasp")
+    home_key = self._mj_model.keyframe("home") # grasp
     self._init_q = jp.array(home_key.qpos)
     self._default_pose = self._init_q[self._hand_qids]
     self._lowers, self._uppers = self.mj_model.actuator_ctrlrange.T

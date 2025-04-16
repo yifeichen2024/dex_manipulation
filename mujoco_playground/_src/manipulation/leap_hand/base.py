@@ -97,10 +97,80 @@ class LeapHandEnv(mjx_env.MjxEnv):
         for name in consts.FINGERTIP_NAMES
     ])
   
-  def get_contact_information(self, data:mjx.Data) -> jax.Array:
-    """Get Contact information between cube and hand"""
+  def get_contact_information(self, data: mjx.Data) -> tuple:
+    """获取手指尖与 cube 之间的接触信息。
+    
+    返回一个四元组，依次为：
+      - contact_positions: 每个 fingertip 的接触位置（拼接后的 1D 数组）
+      - contact_frames: 每个 fingertip 的接触坐标系（扁平化为 1D 数组）
+      - contact_forces: 每个 fingertip 的平均接触力
+      - contact_torques: 每个 fingertip 的平均接触力矩
+    """
+    import numpy as np
+
+    hand_tip_names = ['if_tip', 'mf_tip', 'rf_tip', 'th_tip']
     object_name = 'cube'
-    pass
+    positions_list = []
+    frames_list = []
+    forces_list = []
+    torques_list = []
+
+    for tip in hand_tip_names:
+        total_pos = np.zeros(3)
+        total_frame = np.zeros((3, 3))
+        total_force = np.zeros(3)
+        total_torque = np.zeros(3)
+        count = 0
+
+        for i in range(data.ncon):
+            contact = data.contact[i]
+            geom1_id, geom2_id = contact.geom1, contact.geom2
+            body1_id = self.mj_model.geom_bodyid[geom1_id]
+            body2_id = self.mj_model.geom_bodyid[geom2_id]
+            body1_name = self.mj_model.body(body1_id).name
+            body2_name = self.mj_model.body(body2_id).name
+            if isinstance(body1_name, bytes):
+                body1_name = body1_name.decode()
+            if isinstance(body2_name, bytes):
+                body2_name = body2_name.decode()
+            if ((body1_name == tip and body2_name == object_name) or
+                (body2_name == tip and body1_name == object_name)):
+                total_pos += contact.pos.copy()
+                total_frame += contact.frame.copy().reshape(3, 3)
+                force_torque = np.zeros(6, dtype=np.float64)
+                mujoco.mj_contactForce(self.mj_model, data, i, force_torque)
+                total_force += force_torque[:3]
+                total_torque += force_torque[3:]
+                count += 1
+
+        if count > 0:
+            avg_pos = total_pos / count
+            avg_frame = total_frame / count
+            avg_force = total_force / count
+            avg_torque = total_torque / count
+        else:
+            avg_pos = np.zeros(3)
+            avg_frame = np.zeros((3, 3))
+            avg_force = np.zeros(3)
+            avg_torque = np.zeros(3)
+        positions_list.append(avg_pos)
+        frames_list.append(avg_frame.flatten())
+        forces_list.append(avg_force)
+        torques_list.append(avg_torque)
+
+    contact_positions = np.concatenate(positions_list)
+    contact_frames = np.concatenate(frames_list)
+    contact_forces = np.concatenate(forces_list)
+    contact_torques = np.concatenate(torques_list)
+
+    # 转换成 jax 数组，保持和其他 sensor 数据一致
+    return jp.array(contact_positions), jp.array(contact_frames), jp.array(contact_forces), jp.array(contact_torques)
+
+
+  # def get_contact_information(self, data:mjx.Data) -> jax.Array:
+  #   """Get Contact information between cube and hand"""
+  #   object_name = 'cube'
+  #   pass
 
   # Accessors.
 
