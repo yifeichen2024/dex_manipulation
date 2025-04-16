@@ -1,69 +1,35 @@
-# Copyright 2025 DeepMind Technologies Limited
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-# ==============================================================================
-"""Tests for the registry module."""
+# Copyright 2025 DeepMind ...
+"""Tests for CubeRotateZAxisFC registration."""
 
 from absl.testing import absltest
 from ml_collections import config_dict
-
-from mujoco_playground._src import dm_control_suite
-from mujoco_playground._src import locomotion
 from mujoco_playground._src import manipulation
 from mujoco_playground._src import registry
+from mujoco_playground._src.manipulation.leap_hand import rotate_z_fc
 
+class CubeRotateZAxisFCTest(absltest.TestCase):
 
-class RegistryTest(absltest.TestCase):
-
-  def test_new_env(self):
-    class DemoEnv:
-
-      def __init__(self, config, config_overrides):
-        pass
-
-    def demo_default_config() -> None:
-      return config_dict.ConfigDict()
-
-    dm_control_suite.register_environment(
-        'DemoEnv', DemoEnv, demo_default_config
-    )
-    env = registry.load('DemoEnv')
-    self.assertIsInstance(env, DemoEnv)
-    config = registry.get_default_config('DemoEnv')
-    self.assertEqual(config, config_dict.ConfigDict())
-
-    manipulation.register_environment('DemoEnv', DemoEnv, demo_default_config)
-    env = registry.load('DemoEnv')
-    self.assertIsInstance(env, DemoEnv)
-    config = registry.get_default_config('DemoEnv')
-    self.assertEqual(config, config_dict.ConfigDict())
-
-    locomotion.register_environment('DemoEnv', DemoEnv, demo_default_config)
-    env = registry.load('DemoEnv')
-    self.assertIsInstance(env, DemoEnv)
-    config = registry.get_default_config('DemoEnv')
-    self.assertEqual(config, config_dict.ConfigDict())
-
-  def test_constants(self) -> None:
-    self.assertNotEmpty(dm_control_suite.ALL_ENVS)
-    self.assertNotEmpty(locomotion.ALL_ENVS)
-    self.assertNotEmpty(manipulation.ALL_ENVS)
-    self.assertNotEmpty(registry.ALL_ENVS)
-    self.assertEqual(
-        registry.ALL_ENVS,
-        dm_control_suite.ALL_ENVS + locomotion.ALL_ENVS + manipulation.ALL_ENVS,
+  def test_environment_registration(self):
+    # 注册环境（如果还没有注册，可手动调用注册函数，或确保在项目初始化时已经注册）
+    manipulation.register_environment(
+        'CubeRotateZAxisFC',
+        rotate_z_fc.CubeRotateZAxisFC,
+        rotate_z_fc.default_config,
     )
 
+    # 通过 registry.load 加载环境实例
+    env = manipulation.load('CubeRotateZAxisFC')
+    self.assertIsNotNone(env)
+    self.assertTrue(hasattr(env, 'step'))
+    self.assertTrue(hasattr(env, 'reset'))
+  
+  def test_default_config(self):
+    # 获取默认配置
+    config = manipulation.get_default_config('CubeRotateZAxisFC')
+    # 配置中应包含 force_closure 的权重项
+    self.assertIn('force_closure', config.reward_config.scales)
+    # 例如，默认值为 1.0
+    self.assertEqual(config.reward_config.scales.force_closure, 1.0)
 
 if __name__ == '__main__':
   absltest.main()

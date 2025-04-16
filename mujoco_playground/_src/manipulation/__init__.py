@@ -28,7 +28,7 @@ from mujoco_playground._src.manipulation.franka_emika_panda import pick_cartesia
 from mujoco_playground._src.manipulation.franka_emika_panda_robotiq import push_cube as robotiq_push_cube
 from mujoco_playground._src.manipulation.leap_hand import reorient as leap_cube_reorient
 from mujoco_playground._src.manipulation.leap_hand import rotate_z as leap_rotate_z
-
+from mujoco_playground._src.manipulation.leap_hand import rotate_z_fc as leap_rotate_z_fc
 _envs = {
     "AlohaHandOver": aloha_handover.HandOver,
     "AlohaSinglePegInsertion": aloha_peg.SinglePegInsertion,
@@ -39,6 +39,7 @@ _envs = {
     "PandaRobotiqPushCube": robotiq_push_cube.PandaRobotiqPushCube,
     "LeapCubeReorient": leap_cube_reorient.CubeReorient,
     "LeapCubeRotateZAxis": leap_rotate_z.CubeRotateZAxis,
+    "CubeRotateZAxisFC": leap_rotate_z_fc.CubeRotateZAxisFC
 }
 
 _cfgs = {
@@ -51,11 +52,13 @@ _cfgs = {
     "PandaRobotiqPushCube": robotiq_push_cube.default_config,
     "LeapCubeReorient": leap_cube_reorient.default_config,
     "LeapCubeRotateZAxis": leap_rotate_z.default_config,
+    "CubeRotateZAxisFC": leap_rotate_z_fc.default_config,
 }
 
 _randomizer = {
     "LeapCubeRotateZAxis": leap_rotate_z.domain_randomize,
     "LeapCubeReorient": leap_cube_reorient.domain_randomize,
+    "CubeRotateZAxisFC": leap_rotate_z_fc.domain_randomize,
 }
 
 
